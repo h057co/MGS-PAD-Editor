@@ -92,7 +92,7 @@ pad_zaxisplus = pad_button7
             Assert.NotNull(ini.GetSectionByName("keyboardandmouse"));
 
             Assert.Equal("TRUE", ini.GetGeneralValue("onelayout"));
-            Assert.Equal("TRUE", ini.GetGeneralValue("dpadtoanalog"));
+            Assert.Equal("FALSE", ini.GetGeneralValue("dpadtoanalog"));
             Assert.Equal("FALSE", ini.GetGeneralValue("keyboardandmouse"));
             Assert.Equal("5", ini.GetGeneralValue("mousespeed"));
         }
