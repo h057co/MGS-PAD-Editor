@@ -82,3 +82,4 @@ dotnet publish src/MgsPadEditor/MgsPadEditor.csproj -c Release -r win-x64 --self
 * **Autor:** Luis Jimenez Aka **"Hostility"** ([GitHub @h057co](https://github.com/h057co))
 * **Licencia:** [MIT License](LICENSE) — Software libre y gratuito para toda la comunidad.
 * *Metal Gear Solid es marca registrada de Konami Digital Entertainment.*
+
