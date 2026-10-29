@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+
+    <!-- App Identity & Metadata -->
+    <AssemblyName>MgsPadEditor</AssemblyName>
+    <Product>MGS PAD Editor</Product>
+    <Title>MGS PAD Editor</Title>
+    <Description>Configurador Táctico de Mandos para Metal Gear Solid 1 PC / GOG. Soporte para DualSense (PS5), DualShock 4, Xbox, DirectInput y Teclado/Ratón.</Description>
+    <Authors>Luis Jimenez Aka 'Hostility'</Authors>
+    <Company>Hostility</Company>
+    <Copyright>Copyright © 2026 Luis Jimenez (Hostility). Licencia MIT.</Copyright>
+    <PackageProjectUrl>https://github.com/h057co</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/h057co</RepositoryUrl>
+    <Version>2.0.0</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SharpDX.DirectInput" Version="4.2.0" />
+  </ItemGroup>
+
+</Project>

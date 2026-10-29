@@ -1,0 +1,531 @@
+<Window x:Class="MgsPadEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:MgsPadEditor.ViewModels"
+        xmlns:views="clr-namespace:MgsPadEditor.Views"
+        Title="{Binding WindowTitle}" Height="800" Width="1140"
+        MinHeight="620" MinWidth="880"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BrushBgMain}" Foreground="{StaticResource BrushTextWhite}"
+        Closing="Window_Closing">
+
+    <Window.DataContext>
+        <vm:MainViewModel x:Name="ViewModel"/>
+    </Window.DataContext>
+
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}"/>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}"/>
+        <KeyBinding Key="G" Modifiers="Control" Command="{Binding SelectGameFolderCommand}"/>
+    </Window.InputBindings>
+
+    <Window.Resources>
+        <!-- Brutalist TabItem Style -->
+        <Style x:Key="BrutalistTabItem" TargetType="TabItem">
+            <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}"/>
+            <Setter Property="FontWeight" Value="Black"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontFamily" Value="{StaticResource MonoFont}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid Margin="0,0,4,0">
+                            <!-- Brutalist Tab Shadow -->
+                            <Border Background="#000000" Margin="2,2,0,0"/>
+                            <!-- Tab Face -->
+                            <Border x:Name="TabBorder"
+                                    Background="#141722"
+                                    BorderBrush="#000000"
+                                    BorderThickness="2"
+                                    Margin="0,0,2,2"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TabBorder" Property="Background" Value="{StaticResource BrushBgCard}"/>
+                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource BrushAccentCyan}"/>
+                                <Setter Property="Foreground" Value="{StaticResource BrushAccentCyan}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource BrushAccentGreen}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Brutalist DataGrid Row & Cell Styles -->
+        <Style x:Key="BrutalistDataGridHeader" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#090A0E"/>
+            <Setter Property="Foreground" Value="{StaticResource BrushAccentGreen}"/>
+            <Setter Property="FontFamily" Value="{StaticResource MonoFont}"/>
+            <Setter Property="FontWeight" Value="Black"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="BorderBrush" Value="#000000"/>
+            <Setter Property="BorderThickness" Value="0,0,1,2"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- 0: Menu -->
+            <RowDefinition Height="Auto"/> <!-- 1: Tactical Game Location Command Bar -->
+            <RowDefinition Height="Auto"/> <!-- 2: Profile & Device Command Bar -->
+            <RowDefinition Height="*"/>    <!-- 3: Main Workspace Tabs -->
+            <RowDefinition Height="Auto"/> <!-- 4: Status / Telemetry Bar -->
+        </Grid.RowDefinitions>
+
+        <!-- ========================================================= -->
+        <!-- ROW 0: MENU BAR (Tactical Cyber-Brutalist)                -->
+        <!-- ========================================================= -->
+        <Menu Grid.Row="0" Background="#0A0C12" Foreground="{StaticResource BrushTextWhite}" Padding="6,4" BorderBrush="#000000" BorderThickness="0,0,0,2">
+            <MenuItem Header="[ ARCHIVO ]" FontWeight="Bold" FontFamily="{StaticResource MonoFont}" FontSize="11">
+                <MenuItem Header="📁 Seleccionar Carpeta del Juego..." Command="{Binding SelectGameFolderCommand}" InputGestureText="Ctrl+G"/>
+                <MenuItem Header="🔍 Auto-Detectar Juego (Registro GOG)" Command="{Binding AutoDetectGameCommand}"/>
+                <MenuItem Header="📂 Abrir Carpeta del Juego en Explorador" Command="{Binding OpenGameFolderInExplorerCommand}"/>
+                <Separator Background="#262B3A"/>
+                <MenuItem Header="Abrir dixi.ini..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
+                <MenuItem Header="💾 Guardar" Command="{Binding SaveCommand}" InputGestureText="Ctrl+S"/>
+                <MenuItem Header="Guardar Como..." Command="{Binding SaveAsCommand}"/>
+                <Separator Background="#262B3A"/>
+                <MenuItem Header="Salir" Click="MenuExit_Click"/>
+            </MenuItem>
+            <MenuItem Header="[ PERFILES ]" FontWeight="Bold" FontFamily="{StaticResource MonoFont}" FontSize="11">
+                <MenuItem Header="+ Nuevo Perfil..." Command="{Binding AddProfileCommand}"/>
+                <MenuItem Header="📋 Duplicar Perfil Actual" Command="{Binding CloneProfileCommand}"/>
+                <MenuItem Header="🗑 Eliminar Perfil Actual" Command="{Binding RemoveProfileCommand}"/>
+                <Separator Background="#262B3A"/>
+                <MenuItem Header="⚡ Auto-emparejar con Mando Conectado" Command="{Binding AutoMatchCommand}"/>
+            </MenuItem>
+            <MenuItem Header="[ PRESETS RÁPIDOS ]" FontWeight="Bold" FontFamily="{StaticResource MonoFont}" FontSize="11">
+                <MenuItem Header="⭐ MGS 1 Clásico PS1 (DualSense PS5)" Command="{Binding ApplyDualSensePs1ProfileCommand}" FontWeight="Bold"/>
+                <Separator Background="#262B3A"/>
+                <MenuItem Header="Restaurar a Xbox (360 / One / Series)" Command="{Binding PresetXboxCommand}"/>
+                <MenuItem Header="Restaurar a Sony DualShock 4" Command="{Binding PresetDualShock4Command}"/>
+            </MenuItem>
+            <MenuItem Header="[ HERRAMIENTAS ]" FontWeight="Bold" FontFamily="{StaticResource MonoFont}" FontSize="11">
+                <MenuItem Header="🔄 Actualizar Lista de Mandos" Command="{Binding RefreshDevicesCommand}"/>
+                <MenuItem Header="🎯 Probar Mando en Vivo (Telemetry)..." Command="{Binding TestDeviceCommand}"/>
+                <Separator Background="#262B3A"/>
+                <MenuItem Header="🛠 Sincronizar / Reparar mgs.cfg del Juego" Command="{Binding RepairMgsCfgCommand}"/>
+                <Separator Background="#262B3A"/>
+                <MenuItem Header="Acerca de MGS PAD Editor..." Click="MenuAbout_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- ========================================================= -->
+        <!-- ROW 1: GAME LOCATION TELEMETRY BAR                        -->
+        <!-- ========================================================= -->
+        <Border Grid.Row="1" Background="{StaticResource BrushBgPanel}" BorderBrush="#000000" BorderThickness="0,0,0,2" Padding="12,7">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left: Tactical Path Header -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#000000" BorderBrush="{StaticResource BrushAccentYellow}" BorderThickness="1" Padding="6,2" Margin="0,0,8,0">
+                        <TextBlock Text="📁 GAME PATH" FontWeight="Black" Foreground="{StaticResource BrushAccentYellow}" FontFamily="{StaticResource MonoFont}" FontSize="10"/>
+                    </Border>
+                    <Border Background="#000000" BorderBrush="#000000" BorderThickness="2" Padding="10,4" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding GameDirectoryDisplay}" Foreground="{StaticResource BrushAccentGreen}" FontFamily="{StaticResource MonoFont}" FontSize="11" FontWeight="Bold" ToolTip="{Binding GameDirectory}"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Right: Brutalist Action Buttons -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="CAMBIAR..." Command="{Binding SelectGameFolderCommand}" Style="{StaticResource BtnCyan}" Width="100" Height="26" Margin="4,0,0,0"/>
+                    <Button Content="DETECTAR GOG" Command="{Binding AutoDetectGameCommand}" Style="{StaticResource BtnDark}" Width="105" Height="26" Margin="4,0,0,0"/>
+                    <Button Content="EXPLORADOR" Command="{Binding OpenGameFolderInExplorerCommand}" Style="{StaticResource BtnDark}" Width="95" Height="26" Margin="4,0,0,0"/>
+                    <Button Content="🛠 REPARAR MGS.CFG" Command="{Binding RepairMgsCfgCommand}" Style="{StaticResource BtnYellow}" Width="135" Height="26" Margin="4,0,0,0" ToolTip="Restaura mgs.cfg a su estándar 1:1 eliminando conflictos internos con dixi.ini"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ========================================================= -->
+        <!-- ROW 2: PROFILE & DEVICE COMMAND BAR                       -->
+        <!-- ========================================================= -->
+        <Border Grid.Row="2" Background="{StaticResource BrushBgCard}" BorderBrush="#000000" BorderThickness="0,0,0,2" Padding="12,8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Row 1 Left: Profile Selector & CRUD -->
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#000000" BorderBrush="{StaticResource BrushAccentCyan}" BorderThickness="1" Padding="6,2" Margin="0,0,6,0">
+                        <TextBlock Text="PERFIL" FontWeight="Black" Foreground="{StaticResource BrushAccentCyan}" FontFamily="{StaticResource MonoFont}" FontSize="10"/>
+                    </Border>
+                    
+                    <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}"
+                              Width="230" Height="28" VerticalContentAlignment="Center"
+                              FontWeight="Bold"/>
+
+                    <Button Content="+ NUEVO" Command="{Binding AddProfileCommand}" Style="{StaticResource BtnCyan}" Width="75" Height="28" Margin="6,0,0,0"/>
+                    <Button Content="DUPLICAR" Command="{Binding CloneProfileCommand}" Style="{StaticResource BtnDark}" Width="80" Height="28" Margin="4,0,0,0"/>
+                    <Button Content="ELIMINAR" Command="{Binding RemoveProfileCommand}" Style="{StaticResource BtnRed}" Width="80" Height="28" Margin="4,0,0,0"/>
+
+                    <!-- GUID display -->
+                    <Border Background="#000000" BorderBrush="{StaticResource BrushBorderSubtle}" BorderThickness="1" Padding="5,2" Margin="16,0,6,0">
+                        <TextBlock Text="GUID" FontWeight="Black" Foreground="{StaticResource BrushTextMuted}" FontFamily="{StaticResource MonoFont}" FontSize="10"/>
+                    </Border>
+                    <TextBox Text="{Binding ProfileGuid, UpdateSourceTrigger=PropertyChanged}" Width="240" Height="28"
+                             Background="#0A0C12" Foreground="{StaticResource BrushAccentCyan}" BorderBrush="#000000" BorderThickness="2"
+                             FontFamily="{StaticResource MonoFont}" FontWeight="Bold" VerticalContentAlignment="Center" Padding="6,0"/>
+                </StackPanel>
+
+                <!-- Row 1 Right: Save & Open -->
+                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="ABRIR..." Command="{Binding OpenCommand}" Style="{StaticResource BtnDark}" Width="80" Height="30" Margin="0,0,6,0"/>
+                    <Button Content="💾 GUARDAR" Command="{Binding SaveCommand}" Style="{StaticResource BtnGreen}" Width="110" Height="30" FontSize="11" FontWeight="Black"/>
+                </StackPanel>
+
+                <!-- Row 2: Physical Device & Search Filter -->
+                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Device Selector -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Background="#000000" BorderBrush="{StaticResource BrushAccentGreen}" BorderThickness="1" Padding="6,2" Margin="0,0,6,0">
+                            <TextBlock Text="MANDO" FontWeight="Black" Foreground="{StaticResource BrushAccentGreen}" FontFamily="{StaticResource MonoFont}" FontSize="10"/>
+                        </Border>
+                        
+                        <ComboBox ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice}" DisplayMemberPath="DisplayLabel"
+                                  Width="300" Height="28" VerticalContentAlignment="Center"/>
+
+                        <Button Content="REFRESCAR" Command="{Binding RefreshDevicesCommand}" Style="{StaticResource BtnDark}" Width="85" Height="28" Margin="6,0,0,0"/>
+                        <Button Content="AUTO-EMPAREJAR" Command="{Binding AutoMatchCommand}" Style="{StaticResource BtnCyan}" Width="120" Height="28" Margin="4,0,0,0"/>
+                        <Button Content="🎯 PROBAR EN VIVO" Command="{Binding TestDeviceCommand}" Style="{StaticResource BtnYellow}" Width="125" Height="28" Margin="4,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- Search Filter Box -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Background="#000000" BorderBrush="{StaticResource BrushTextMuted}" BorderThickness="1" Padding="5,2" Margin="0,0,6,0">
+                            <TextBlock Text="FILTRO" FontWeight="Black" Foreground="{StaticResource BrushTextSecondary}" FontFamily="{StaticResource MonoFont}" FontSize="10"/>
+                        </Border>
+                        <TextBox Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged}" Width="180" Height="28"
+                                 Background="#0A0C12" Foreground="#FFFFFF" BorderBrush="#000000" BorderThickness="2"
+                                 FontFamily="{StaticResource MonoFont}" VerticalContentAlignment="Center" Padding="6,0"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- ========================================================= -->
+        <!-- ROW 3: MAIN WORKSPACE TABS                                -->
+        <!-- ========================================================= -->
+        <TabControl Grid.Row="3" Background="{StaticResource BrushBgMain}" BorderBrush="#000000" BorderThickness="0,2,0,0" Margin="10,6,10,8">
+            <!-- TAB 1: CONTROLLER MAPPINGS -->
+            <TabItem Header="[ MANDO // CONTROLLER ]" Style="{StaticResource BrutalistTabItem}">
+                <Grid Margin="6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- View Switcher Toolbar -->
+                    <Border Grid.Row="0" Background="#0C0E14" BorderBrush="#000000" BorderThickness="2" Padding="10,6" Margin="0,0,0,8">
+                        <DockPanel>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="●" Foreground="{StaticResource BrushAccentGreen}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="MAPEO DIRECTINPUT // DIXI.INI" FontFamily="{StaticResource MonoFont}" FontWeight="Bold" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                                <RadioButton Content="🎮 VISTA VISUAL DUALSENSE (PS5)" IsChecked="{Binding IsVisualMode}"
+                                             Foreground="{StaticResource BrushAccentCyan}" FontWeight="Black" FontFamily="{StaticResource MonoFont}" FontSize="11" Margin="0,0,18,0" VerticalAlignment="Center" Cursor="Hand"/>
+                                <RadioButton Content="📋 VISTA DE TABLA (DETALLADA)" IsChecked="{Binding IsTableMode}"
+                                             Foreground="{StaticResource BrushTextSecondary}" FontWeight="Black" FontFamily="{StaticResource MonoFont}" FontSize="11" VerticalAlignment="Center" Cursor="Hand"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- VIEW 1: DualSense PS5 Interactive Vector View -->
+                    <views:DualSenseVisualView Grid.Row="1">
+                        <views:DualSenseVisualView.Style>
+                            <Style TargetType="views:DualSenseVisualView">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsVisualMode}" Value="False">
+                                         <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </views:DualSenseVisualView.Style>
+                    </views:DualSenseVisualView>
+
+                    <!-- VIEW 2: Mappings Table (Detailed DataGrid) -->
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding ControllerRows}" AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False"
+                              Background="#10121A" RowBackground="#131620" AlternatingRowBackground="#181B26"
+                              BorderBrush="#000000" BorderThickness="2" HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#000000"
+                              Foreground="{StaticResource BrushTextWhite}" ColumnHeaderStyle="{StaticResource BrutalistDataGridHeader}">
+                        <DataGrid.Style>
+                            <Style TargetType="DataGrid">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsTableMode}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.Style>
+
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+
+                        <DataGrid.Columns>
+                            <!-- Input Key -->
+                            <DataGridTextColumn Header="ENTRADA (MANDO)" Binding="{Binding InputKey}" IsReadOnly="True" Width="200">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontFamily" Value="{StaticResource MonoFont}"/>
+                                        <Setter Property="FontWeight" Value="Black"/>
+                                        <Setter Property="Foreground" Value="{StaticResource BrushAccentCyan}"/>
+                                        <Setter Property="Margin" Value="10,6"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Description -->
+                            <DataGridTextColumn Header="ACCIÓN EN METAL GEAR SOLID" Binding="{Binding Description}" IsReadOnly="True" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Margin" Value="10,6"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Target Combobox -->
+                            <DataGridTemplateColumn Header="ASIGNACIÓN (TARGET)" Width="330">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding AvailableTargets}"
+                                                  SelectedValue="{Binding TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedValuePath="Value"
+                                                  DisplayMemberPath="DisplayText"
+                                                  Height="28"
+                                                  Margin="6,3"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Capture Button -->
+                            <DataGridTemplateColumn Header="CAPTURA" Width="110">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="CAPTURAR" Command="{Binding CaptureCommand}"
+                                                Style="{StaticResource BtnCyan}"
+                                                Height="26" Width="90"
+                                                Margin="6,3" FontWeight="Bold"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- TAB 2: KEYBOARD & MOUSE -->
+            <TabItem Header="[ TECLADO &amp; RATÓN ]" Style="{StaticResource BrutalistTabItem}">
+                <Grid Margin="6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="#0C0E14" BorderBrush="#000000" BorderThickness="2" Padding="10,6" Margin="0,0,0,8">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="●" Foreground="{StaticResource BrushAccentYellow}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="CONFIGURACIÓN DE TECLADO Y RATÓN // [KEYBOARDANDMOUSE]" FontFamily="{StaticResource MonoFont}" FontWeight="Bold" FontSize="11" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding KeyboardMouseRows}" AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False"
+                              Background="#10121A" RowBackground="#131620" AlternatingRowBackground="#181B26"
+                              BorderBrush="#000000" BorderThickness="2" HeadersVisibility="Column"
+                              GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#000000"
+                              Foreground="{StaticResource BrushTextWhite}" ColumnHeaderStyle="{StaticResource BrutalistDataGridHeader}">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+
+                        <DataGrid.Columns>
+                            <!-- Input Key -->
+                            <DataGridTextColumn Header="ACCIÓN DE MANDO" Binding="{Binding InputKey}" IsReadOnly="True" Width="200">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FontFamily" Value="{StaticResource MonoFont}"/>
+                                        <Setter Property="FontWeight" Value="Black"/>
+                                        <Setter Property="Foreground" Value="{StaticResource BrushAccentCyan}"/>
+                                        <Setter Property="Margin" Value="10,6"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Description -->
+                            <DataGridTextColumn Header="ACCIÓN EN METAL GEAR SOLID" Binding="{Binding Description}" IsReadOnly="True" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Margin" Value="10,6"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
+                            <!-- Target Combobox -->
+                            <DataGridTemplateColumn Header="TECLA / RATÓN ASIGNADO" Width="330">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding AvailableTargets}"
+                                                  SelectedValue="{Binding TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                                  SelectedValuePath="Value"
+                                                  DisplayMemberPath="DisplayText"
+                                                  Height="28"
+                                                  Margin="6,3"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Capture Button -->
+                            <DataGridTemplateColumn Header="CAPTURA" Width="110">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="CAPTURAR" Command="{Binding CaptureCommand}"
+                                                Style="{StaticResource BtnCyan}"
+                                                Height="26" Width="90"
+                                                Margin="6,3" FontWeight="Bold"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <!-- TAB 3: GENERAL SETTINGS -->
+            <TabItem Header="[ AJUSTES GLOBALES ]" Style="{StaticResource BrutalistTabItem}">
+                <Border Background="{StaticResource BrushBgCard}" BorderBrush="#000000" BorderThickness="2" Padding="25" Margin="8">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#000000" BlurRadius="0" ShadowDepth="4" Direction="315" Opacity="0.95"/>
+                    </Border.Effect>
+                    <StackPanel MaxWidth="650" HorizontalAlignment="Left">
+                        <Border Background="#000000" BorderBrush="{StaticResource BrushAccentCyan}" BorderThickness="2" Padding="8,4" Margin="0,0,0,20">
+                            <TextBlock Text="// PARÁMETROS GLOBALES DEL WRAPPER [GENERAL]" FontFamily="{StaticResource MonoFont}" FontSize="12" FontWeight="Black" Foreground="{StaticResource BrushAccentCyan}"/>
+                        </Border>
+
+                        <!-- One Layout -->
+                        <CheckBox IsChecked="{Binding OneLayout}" Content="ONELAYOUT — Usar un único diseño para todos los mandos"
+                                  FontSize="13" FontWeight="Bold" Margin="0,0,0,6"/>
+                        <TextBlock Text="Fuerza al wrapper a compartir el mismo mapeo entre todos los dispositivos conectados."
+                                   FontSize="11" Foreground="{StaticResource BrushTextMuted}" Margin="26,-2,0,16"/>
+
+                        <!-- D-Pad to Analog -->
+                        <CheckBox IsChecked="{Binding DpadToAnalog}" Content="DPADTOANALOG — Activar emulación de Cruceta a Stick Analógico"
+                                  FontSize="13" FontWeight="Bold" Margin="0,0,0,6"/>
+                        <TextBlock Text="Permite mover a Snake tanto con la cruceta como con el stick analógico."
+                                   FontSize="11" Foreground="{StaticResource BrushTextMuted}" Margin="26,-2,0,16"/>
+
+                        <!-- Keyboard & Mouse Enabled -->
+                        <CheckBox IsChecked="{Binding KeyboardAndMouse}" Content="KEYBOARDANDMOUSE — Activar controles de Teclado y Ratón"
+                                  FontSize="13" FontWeight="Bold" Margin="0,0,0,6"/>
+                        <TextBlock Text="Habilita la sección [keyboardandmouse] en lugar de los mandos DirectInput."
+                                   FontSize="11" Foreground="{StaticResource BrushTextMuted}" Margin="26,-2,0,22"/>
+
+                        <Separator Background="#000000" Margin="0,0,0,20"/>
+
+                        <!-- Mouse Speed -->
+                        <TextBlock Text="VELOCIDAD DEL RATÓN (MOUSESPEED):" FontSize="12" FontWeight="Black" FontFamily="{StaticResource MonoFont}" Foreground="{StaticResource BrushAccentYellow}" Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="80"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Value="{Binding MouseSpeed}" Minimum="0" Maximum="10" IsSnapToTickEnabled="True" TickFrequency="1"
+                                    VerticalAlignment="Center"/>
+                            <Border Grid.Column="1" Background="#000000" BorderBrush="{StaticResource BrushAccentGreen}" BorderThickness="2" Padding="6,2" HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding MouseSpeed, StringFormat='VAL: {0}'}" FontSize="12" FontWeight="Black" FontFamily="{StaticResource MonoFont}" Foreground="{StaticResource BrushAccentGreen}"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+        </TabControl>
+
+        <!-- ========================================================= -->
+        <!-- ROW 4: STATUS / TELEMETRY TICKER BAR                      -->
+        <!-- ========================================================= -->
+        <StatusBar Grid.Row="4" Background="#06070A" Foreground="{StaticResource BrushTextSecondary}" BorderBrush="#000000" BorderThickness="0,2,0,0" Padding="8,4">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+
+            <StatusBarItem Grid.Column="0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="■" Foreground="{StaticResource BrushAccentGreen}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="#FFFFFF" FontFamily="{StaticResource MonoFont}" FontWeight="Bold"/>
+                </StackPanel>
+            </StatusBarItem>
+
+            <StatusBarItem Grid.Column="1" Margin="20,0">
+                <Border Background="#10131B" BorderBrush="#000000" BorderThickness="1" Padding="6,1">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="MANDO: " Foreground="{StaticResource BrushTextMuted}" FontFamily="{StaticResource MonoFont}" FontSize="11"/>
+                        <TextBlock Text="{Binding SelectedDevice.Name, FallbackValue='NINGUNO'}" Foreground="{StaticResource BrushAccentCyan}" FontWeight="Black" FontFamily="{StaticResource MonoFont}" FontSize="11"/>
+                    </StackPanel>
+                </Border>
+            </StatusBarItem>
+
+            <StatusBarItem Grid.Column="2">
+                <TextBlock Text="MGS PAD EDITOR v2.0 // BY HOSTILITY" Foreground="{StaticResource BrushTextMuted}" FontFamily="{StaticResource MonoFont}" FontSize="10"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

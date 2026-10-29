@@ -1,0 +1,34 @@
+# Build and output directories
+bin/
+obj/
+publish/
+[Bb]in/
+[Oo]bj/
+dist/
+build/
+TestResults/
+
+# Single-file releases and archives
+*.exe
+*.dll
+*.pdb
+*.zip
+*.7z
+*.tar.gz
+
+# Visual Studio & IDE files
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# AI / Assistant artifacts
+.mcp_data/
+.gemini/

@@ -1,0 +1,42 @@
+<Window x:Class="MgsPadEditor.Views.CaptureDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Captura de Entrada" Height="270" Width="500"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="{StaticResource BrushBgMain}" Foreground="{StaticResource BrushTextWhite}"
+        Loaded="Window_Loaded" Closed="Window_Closed"
+        KeyDown="Window_KeyDown" MouseDown="Window_MouseDown">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Prompt -->
+        <Border Grid.Row="0" Background="#000000" BorderBrush="{StaticResource BrushAccentCyan}" BorderThickness="1" Padding="8,4" HorizontalAlignment="Center">
+            <TextBlock x:Name="TxtPrompt" Text="Presiona un botón o mueve un eje en tu mando..." FontSize="11" FontWeight="Bold" FontFamily="{StaticResource MonoFont}" Foreground="{StaticResource BrushAccentCyan}" HorizontalAlignment="Center"/>
+        </Border>
+        
+        <!-- Target Action -->
+        <TextBlock x:Name="TxtTargetAction" Text="Disparo / Confirmar (pad_button0)" Grid.Row="1" FontSize="15" FontWeight="Black" FontFamily="{StaticResource MonoFont}" Foreground="#FFFFFF" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+
+        <!-- Detection Card -->
+        <Border Grid.Row="2" Background="{StaticResource BrushBgCard}" BorderBrush="#000000" BorderThickness="2" Padding="15" Margin="0,14,0,14" VerticalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="0" ShadowDepth="4" Direction="315" Opacity="0.95"/>
+            </Border.Effect>
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock x:Name="TxtStatus" Text="ESPERANDO PULSACIÓN..." FontSize="16" FontWeight="Black" FontFamily="{StaticResource MonoFont}" Foreground="{StaticResource BrushAccentGreen}" HorizontalAlignment="Center"/>
+                <TextBlock x:Name="TxtSubtitle" Text="La detección es automática" FontSize="11" Foreground="{StaticResource BrushTextMuted}" FontFamily="{StaticResource MonoFont}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="BtnAccept" Content="CONFIRMAR" Width="120" Height="32" Click="BtnAccept_Click" IsEnabled="False" Style="{StaticResource BtnGreen}" Margin="0,0,12,0"/>
+            <Button Content="CANCELAR" Width="110" Height="32" Click="BtnCancel_Click" Style="{StaticResource BtnDark}"/>
+        </StackPanel>
+    </Grid>
+</Window>

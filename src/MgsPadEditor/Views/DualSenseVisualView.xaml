@@ -1,0 +1,528 @@
+<UserControl x:Class="MgsPadEditor.Views.DualSenseVisualView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{StaticResource BrushBgMain}">
+    <UserControl.Resources>
+        <!-- Card Style: Digital Brutalism container with solid black border & offset shadow -->
+        <Style x:Key="BrutalistCardItem" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource BrushBgCard}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BrushBorderBlack}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Margin" Value="0,3"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#000000" BlurRadius="0" ShadowDepth="3" Direction="315" Opacity="0.95"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Dropdown styling inside brutalist cards (inherits global brutalist template) -->
+        <Style x:Key="VisualComboStyle" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Quick Capture Mini Button -->
+        <Style x:Key="VisualCaptureBtnStyle" TargetType="Button" BasedOn="{StaticResource BtnCyan}">
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Padding" Value="6,1"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <Grid Margin="16" MinWidth="1020">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/> <!-- Left Panel: L1, L2, D-Pad, L3, Create -->
+                <ColumnDefinition Width="*"/>   <!-- Center: PS5 DualSense Vector Tactical HUD -->
+                <ColumnDefinition Width="300"/> <!-- Right Panel: R1, R2, Face Buttons, R3, Options -->
+            </Grid.ColumnDefinitions>
+
+            <!-- ========================================================= -->
+            <!-- PANEL IZQUIERDO: Gatillos Izq, Cruceta, Stick Izquierdo   -->
+            <!-- ========================================================= -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,12,0">
+                <!-- Tactical Header Label -->
+                <Border Background="#000000" BorderBrush="{StaticResource BrushAccentCyan}" BorderThickness="2" Padding="8,4" Margin="0,0,0,8">
+                    <DockPanel>
+                        <TextBlock Text="■" Foreground="{StaticResource BrushAccentCyan}" FontWeight="Black" Margin="0,0,6,0"/>
+                        <TextBlock Text="GATILLOS Y CRUCETA [IZQ]" FontWeight="Black" FontSize="11" Foreground="#FFFFFF" FontFamily="{StaticResource MonoFont}"/>
+                    </DockPanel>
+                </Border>
+
+                <!-- L2 Trigger -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushTextWhite}" BorderThickness="1" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="L2" FontWeight="Black" Foreground="#FFFFFF" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="Gatillo Izq (Z+)" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center" FontSize="11"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowL2.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowL2.AvailableTargets}"
+                                  SelectedValue="{Binding RowL2.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- L1 Bumper -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushTextWhite}" BorderThickness="1" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="L1" FontWeight="Black" Foreground="#FFFFFF" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="Botón Sup Izq (L1)" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center" FontSize="11"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowL1.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowL1.AvailableTargets}"
+                                  SelectedValue="{Binding RowL1.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- D-Pad UP -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushAccentCyan}" BorderThickness="1" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="▲ UP" FontWeight="Black" Foreground="{StaticResource BrushAccentCyan}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="Cruceta Arriba" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center" FontSize="11"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowDpadUp.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowDpadUp.AvailableTargets}"
+                                  SelectedValue="{Binding RowDpadUp.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- D-Pad LEFT / RIGHT -->
+                <Grid Margin="0,1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource BrutalistCardItem}" Margin="0,2,2,2">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="◀ IZQ" FontWeight="Black" Foreground="{StaticResource BrushAccentCyan}" FontSize="10" FontFamily="{StaticResource MonoFont}"/>
+                                <Button Content="REC" Command="{Binding RowDpadLeft.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" Width="38" HorizontalAlignment="Right"/>
+                            </DockPanel>
+                            <ComboBox ItemsSource="{Binding RowDpadLeft.AvailableTargets}"
+                                      SelectedValue="{Binding RowDpadLeft.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                      Style="{StaticResource VisualComboStyle}" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource BrutalistCardItem}" Margin="2,2,0,2">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="DER ▶" FontWeight="Black" Foreground="{StaticResource BrushAccentCyan}" FontSize="10" FontFamily="{StaticResource MonoFont}"/>
+                                <Button Content="REC" Command="{Binding RowDpadRight.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" Width="38" HorizontalAlignment="Right"/>
+                            </DockPanel>
+                            <ComboBox ItemsSource="{Binding RowDpadRight.AvailableTargets}"
+                                      SelectedValue="{Binding RowDpadRight.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                      Style="{StaticResource VisualComboStyle}" Margin="0,3,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- D-Pad DOWN -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushAccentCyan}" BorderThickness="1" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="▼ DOWN" FontWeight="Black" Foreground="{StaticResource BrushAccentCyan}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="Cruceta Abajo" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center" FontSize="11"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowDpadDown.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowDpadDown.AvailableTargets}"
+                                  SelectedValue="{Binding RowDpadDown.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- L3 Stick Click -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushTextWhite}" BorderThickness="1" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="L3" FontWeight="Black" Foreground="#FFFFFF" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="Click Stick Izq (L3)" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center" FontSize="11"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowL3.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowL3.AvailableTargets}"
+                                  SelectedValue="{Binding RowL3.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Create / Share -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushAccentYellow}" BorderThickness="1" Padding="5,1" Margin="0,0,6,0">
+                                <TextBlock Text="CREATE" FontWeight="Black" Foreground="{StaticResource BrushAccentYellow}" FontSize="10" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="Share / Select" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center" FontSize="11"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowCreate.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowCreate.AvailableTargets}"
+                                  SelectedValue="{Binding RowCreate.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ========================================================= -->
+            <!-- CENTRO: Diagrama Vectorial del DualSense de PS5          -->
+            <!-- ========================================================= -->
+            <Grid Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Center System Buttons & Preset Header -->
+                    <RowDefinition Height="380"/>  <!-- Vector Controller HUD -->
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="0,0,0,10" HorizontalAlignment="Center">
+                    <!-- HERO DIGITAL BRUTALISM BUTTON: MGS1 PS1 Preset -->
+                    <Button Content="⭐ APLICAR CONTROLES ORIGINALES PS1 AL DUALSENSE"
+                            Command="{Binding ApplyDualSensePs1ProfileCommand}"
+                            Style="{StaticResource BtnGreen}"
+                            Height="36" Padding="16,0" Margin="0,0,0,10"
+                            FontSize="12" FontWeight="Black"
+                            HorizontalAlignment="Center"
+                            ToolTip="Configura Cuadrado (Disparar), Cruz (Agacharse), Círculo (Golpe/Acción), Triángulo (1ra Persona), L2/R2 (Menús) y Select (Códec) idéntico a PS1"/>
+
+                    <!-- System Center Buttons: Touchpad & PS -->
+                    <Grid HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="220"/>
+                            <ColumnDefinition Width="190"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Touchpad -->
+                        <Border Grid.Column="0" Style="{StaticResource BrutalistCardItem}" Margin="0,0,6,0">
+                            <StackPanel>
+                                <DockPanel>
+                                    <Border Background="#000000" BorderBrush="{StaticResource BrushAccentCyan}" BorderThickness="1" Padding="4,1" Margin="0,0,6,0">
+                                        <TextBlock Text="TOUCHPAD" FontWeight="Black" Foreground="{StaticResource BrushAccentCyan}" FontSize="10" FontFamily="{StaticResource MonoFont}"/>
+                                    </Border>
+                                    <Button Content="CAPTURAR" Command="{Binding RowTouchpad.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" Width="65" HorizontalAlignment="Right"/>
+                                </DockPanel>
+                                <ComboBox ItemsSource="{Binding RowTouchpad.AvailableTargets}"
+                                          SelectedValue="{Binding RowTouchpad.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                          Style="{StaticResource VisualComboStyle}" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- PS Button -->
+                        <Border Grid.Column="1" Style="{StaticResource BrutalistCardItem}" Margin="6,0,0,0">
+                            <StackPanel>
+                                <DockPanel>
+                                    <Border Background="#000000" BorderBrush="{StaticResource BrushTextWhite}" BorderThickness="1" Padding="4,1" Margin="0,0,6,0">
+                                        <TextBlock Text="BOTÓN PS" FontWeight="Black" Foreground="#FFFFFF" FontSize="10" FontFamily="{StaticResource MonoFont}"/>
+                                    </Border>
+                                    <Button Content="CAPTURAR" Command="{Binding RowPS.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" Width="65" HorizontalAlignment="Right"/>
+                                </DockPanel>
+                                <ComboBox ItemsSource="{Binding RowPS.AvailableTargets}"
+                                          SelectedValue="{Binding RowPS.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                          Style="{StaticResource VisualComboStyle}" Margin="0,3,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Tactical Blueprint Box surrounding Controller Vector -->
+                <Border Grid.Row="1" Background="#0C0E14" BorderBrush="#000000" BorderThickness="2" Width="460" Height="375" HorizontalAlignment="Center">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#000000" BlurRadius="0" ShadowDepth="4" Direction="315" Opacity="0.95"/>
+                    </Border.Effect>
+                    
+                    <Grid>
+                        <!-- Tactical Blueprint Corner Reticles -->
+                        <TextBlock Text="┌ DI_SYS // PS5" Foreground="{StaticResource BrushAccentGreen}" FontFamily="{StaticResource MonoFont}" FontSize="10" FontWeight="Bold" Margin="8,6,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                        <TextBlock Text="MGS-SOLITON ┐" Foreground="{StaticResource BrushAccentGreen}" FontFamily="{StaticResource MonoFont}" FontSize="10" FontWeight="Bold" Margin="0,6,8,0" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                        <TextBlock Text="└ CH_01 // ACTIVE" Foreground="{StaticResource BrushTextMuted}" FontFamily="{StaticResource MonoFont}" FontSize="9" Margin="8,0,0,6" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                        <TextBlock Text="DIRECTINPUT-RAW ┘" Foreground="{StaticResource BrushTextMuted}" FontFamily="{StaticResource MonoFont}" FontSize="9" Margin="0,0,8,6" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+
+                        <!-- The DualSense Vector Body -->
+                        <Canvas Width="440" Height="340" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,10,0,0">
+                            <!-- Tactical Controller Shadow / Outline -->
+                            <Path Data="M 70 85 C 130 45, 310 45, 370 85 C 410 115, 430 235, 395 320 C 375 360, 335 340, 305 280 C 275 245, 165 245, 135 280 C 105 340, 65 360, 45 320 C 10 235, 30 115, 70 85 Z"
+                                  Fill="#06070A" Stroke="#000000" StrokeThickness="3"/>
+
+                            <!-- Outer Stark White Shell of DualSense (Sharp Brutalist Contrast) -->
+                            <Path Data="M 75 87 C 110 60, 175 55, 205 60 C 205 125, 140 205, 125 275 C 105 340, 65 360, 45 320 C 15 235, 35 120, 75 87 Z"
+                                  Fill="#EAECEF" Stroke="#000000" StrokeThickness="2"/>
+                            <Path Data="M 365 87 C 330 60, 265 55, 235 60 C 235 125, 300 205, 315 275 C 335 340, 375 360, 395 320 C 425 235, 405 120, 365 87 Z"
+                                  Fill="#EAECEF" Stroke="#000000" StrokeThickness="2"/>
+
+                            <!-- Black Inner Lower Chassis -->
+                            <Path Data="M 125 275 C 150 215, 290 215, 315 275 C 335 325, 275 345, 220 345 C 165 345, 105 325, 125 275 Z"
+                                  Fill="#12151F" Stroke="#000000" StrokeThickness="2"/>
+
+                            <!-- DualSense Neon Lightbar Contour (Cyan) -->
+                            <Path Data="M 148 59 C 180 53, 260 53, 292 59 C 298 85, 295 125, 292 140 C 255 145, 185 145, 148 140 C 145 125, 142 85, 148 59 Z"
+                                  Fill="#10131B" Stroke="{StaticResource BrushAccentCyan}" StrokeThickness="2.5">
+                                <Path.Effect>
+                                    <DropShadowEffect Color="#00F0FF" BlurRadius="6" ShadowDepth="0" Opacity="0.8"/>
+                                </Path.Effect>
+                            </Path>
+
+                            <!-- Touchpad Inner Area -->
+                            <Border Canvas.Left="152" Canvas.Top="62" Width="136" Height="74" Background="#181B26" BorderBrush="#000000" BorderThickness="2"/>
+
+                            <!-- L1 / L2 Triggers Visual -->
+                            <Border Canvas.Left="75" Canvas.Top="34" Width="60" Height="22" Background="#1D212F" BorderBrush="#000000" BorderThickness="2">
+                                <TextBlock Text="L1 / L2" FontSize="9" FontWeight="Black" Foreground="{StaticResource BrushAccentCyan}" FontFamily="{StaticResource MonoFont}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <!-- R1 / R2 Triggers Visual -->
+                            <Border Canvas.Left="305" Canvas.Top="34" Width="60" Height="22" Background="#1D212F" BorderBrush="#000000" BorderThickness="2">
+                                <TextBlock Text="R1 / R2" FontSize="9" FontWeight="Black" Foreground="{StaticResource BrushAccentCyan}" FontFamily="{StaticResource MonoFont}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <!-- Create & Options Buttons -->
+                            <Border Canvas.Left="125" Canvas.Top="80" Width="14" Height="22" Background="#000000" BorderBrush="{StaticResource BrushAccentYellow}" BorderThickness="1">
+                                <TextBlock Text="|" FontSize="10" FontWeight="Black" Foreground="{StaticResource BrushAccentYellow}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border Canvas.Left="301" Canvas.Top="80" Width="14" Height="22" Background="#000000" BorderBrush="{StaticResource BrushAccentYellow}" BorderThickness="1">
+                                <TextBlock Text="≡" FontSize="10" FontWeight="Black" Foreground="{StaticResource BrushAccentYellow}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <!-- D-PAD CLUSTER (LEFT) -->
+                            <!-- Base -->
+                            <Rectangle Canvas.Left="70" Canvas.Top="100" Width="70" Height="70" Fill="#12151E" Stroke="#000000" StrokeThickness="2"/>
+                            <!-- Up -->
+                            <Border Canvas.Left="94" Canvas.Top="101" Width="22" Height="22" Background="#1E2330" BorderBrush="#000000" BorderThickness="1">
+                                <TextBlock Text="▲" FontSize="11" Foreground="{StaticResource BrushAccentCyan}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <!-- Down -->
+                            <Border Canvas.Left="94" Canvas.Top="145" Width="22" Height="22" Background="#1E2330" BorderBrush="#000000" BorderThickness="1">
+                                <TextBlock Text="▼" FontSize="11" Foreground="{StaticResource BrushAccentCyan}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <!-- Left -->
+                            <Border Canvas.Left="72" Canvas.Top="123" Width="22" Height="22" Background="#1E2330" BorderBrush="#000000" BorderThickness="1">
+                                <TextBlock Text="◀" FontSize="11" Foreground="{StaticResource BrushAccentCyan}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <!-- Right -->
+                            <Border Canvas.Left="116" Canvas.Top="123" Width="22" Height="22" Background="#1E2330" BorderBrush="#000000" BorderThickness="1">
+                                <TextBlock Text="▶" FontSize="11" Foreground="{StaticResource BrushAccentCyan}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <!-- FACE BUTTONS CLUSTER (RIGHT) - Digital Brutalist PS Symbols -->
+                            <!-- Base -->
+                            <Rectangle Canvas.Left="300" Canvas.Top="100" Width="70" Height="70" Fill="#12151E" Stroke="#000000" StrokeThickness="2"/>
+                            <!-- Triangle (Top - Green) -->
+                            <Border Canvas.Left="324" Canvas.Top="101" Width="22" Height="22" Background="#000000" BorderBrush="{StaticResource BrushAccentGreen}" BorderThickness="2">
+                                <TextBlock Text="△" FontWeight="Black" FontSize="13" Foreground="{StaticResource BrushAccentGreen}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0"/>
+                            </Border>
+                            <!-- Circle (Right - Red) -->
+                            <Border Canvas.Left="346" Canvas.Top="123" Width="22" Height="22" Background="#000000" BorderBrush="{StaticResource BrushAccentRed}" BorderThickness="2">
+                                <TextBlock Text="○" FontWeight="Black" FontSize="13" Foreground="{StaticResource BrushAccentRed}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0"/>
+                            </Border>
+                            <!-- Cross (Bottom - Cyan) -->
+                            <Border Canvas.Left="324" Canvas.Top="145" Width="22" Height="22" Background="#000000" BorderBrush="{StaticResource BrushAccentCyan}" BorderThickness="2">
+                                <TextBlock Text="✕" FontWeight="Black" FontSize="13" Foreground="{StaticResource BrushAccentCyan}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0"/>
+                            </Border>
+                            <!-- Square (Left - Pink) -->
+                            <Border Canvas.Left="302" Canvas.Top="123" Width="22" Height="22" Background="#000000" BorderBrush="{StaticResource BrushAccentPink}" BorderThickness="2">
+                                <TextBlock Text="□" FontWeight="Black" FontSize="13" Foreground="{StaticResource BrushAccentPink}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0"/>
+                            </Border>
+
+                            <!-- STICKS CLUSTER -->
+                            <!-- Left Stick (L3) -->
+                            <Border Canvas.Left="138" Canvas.Top="176" Width="60" Height="60" Background="#11141D" BorderBrush="#000000" BorderThickness="2">
+                                <Grid>
+                                    <Ellipse Width="46" Height="46" Fill="#1A1E2C" Stroke="{StaticResource BrushAccentCyan}" StrokeThickness="1"/>
+                                    <TextBlock Text="L3" FontWeight="Black" FontSize="11" Foreground="#FFFFFF" FontFamily="{StaticResource MonoFont}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Right Stick (R3) -->
+                            <Border Canvas.Left="242" Canvas.Top="176" Width="60" Height="60" Background="#11141D" BorderBrush="#000000" BorderThickness="2">
+                                <Grid>
+                                    <Ellipse Width="46" Height="46" Fill="#1A1E2C" Stroke="{StaticResource BrushAccentCyan}" StrokeThickness="1"/>
+                                    <TextBlock Text="R3" FontWeight="Black" FontSize="11" Foreground="#FFFFFF" FontFamily="{StaticResource MonoFont}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- PS Button Center -->
+                            <Border Canvas.Left="208" Canvas.Top="194" Width="24" Height="24" Background="#000000" BorderBrush="{StaticResource BrushAccentCyan}" BorderThickness="2">
+                                <TextBlock Text="PS" FontWeight="Black" FontSize="9" Foreground="{StaticResource BrushAccentCyan}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <!-- Mute Mic Button -->
+                            <Border Canvas.Left="214" Canvas.Top="222" Width="12" Height="6" Background="{StaticResource BrushAccentYellow}" BorderBrush="#000000" BorderThickness="1"/>
+                        </Canvas>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ========================================================= -->
+            <!-- PANEL DERECHO: Gatillos Der, Botones Acción, Stick Der    -->
+            <!-- ========================================================= -->
+            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0">
+                <!-- Tactical Header Label -->
+                <Border Background="#000000" BorderBrush="{StaticResource BrushAccentGreen}" BorderThickness="2" Padding="8,4" Margin="0,0,0,8">
+                    <DockPanel>
+                        <TextBlock Text="■" Foreground="{StaticResource BrushAccentGreen}" FontWeight="Black" Margin="0,0,6,0"/>
+                        <TextBlock Text="GATILLOS Y ACCIONES [DER]" FontWeight="Black" FontSize="11" Foreground="#FFFFFF" FontFamily="{StaticResource MonoFont}"/>
+                    </DockPanel>
+                </Border>
+
+                <!-- R2 Trigger -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushTextWhite}" BorderThickness="1" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="R2" FontWeight="Black" Foreground="#FFFFFF" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="Gatillo Der (RZ+)" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center" FontSize="11"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowR2.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowR2.AvailableTargets}"
+                                  SelectedValue="{Binding RowR2.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- R1 Bumper -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushTextWhite}" BorderThickness="1" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="R1" FontWeight="Black" Foreground="#FFFFFF" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="Botón Sup Der (R1)" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center" FontSize="11"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowR1.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowR1.AvailableTargets}"
+                                  SelectedValue="{Binding RowR1.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Triangle (△) -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushAccentGreen}" BorderThickness="2" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="△ TRIÁNGULO" FontWeight="Black" Foreground="{StaticResource BrushAccentGreen}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="pad_button3" FontWeight="Bold" Foreground="{StaticResource BrushTextMuted}" VerticalAlignment="Center" FontSize="10" FontFamily="{StaticResource MonoFont}"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowTriangle.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowTriangle.AvailableTargets}"
+                                  SelectedValue="{Binding RowTriangle.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Circle (○) -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushAccentRed}" BorderThickness="2" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="○ CÍRCULO" FontWeight="Black" Foreground="{StaticResource BrushAccentRed}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="pad_button2" FontWeight="Bold" Foreground="{StaticResource BrushTextMuted}" VerticalAlignment="Center" FontSize="10" FontFamily="{StaticResource MonoFont}"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowCircle.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowCircle.AvailableTargets}"
+                                  SelectedValue="{Binding RowCircle.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Cross (✕) -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushAccentCyan}" BorderThickness="2" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="✕ CRUZ" FontWeight="Black" Foreground="{StaticResource BrushAccentCyan}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="pad_button1" FontWeight="Bold" Foreground="{StaticResource BrushTextMuted}" VerticalAlignment="Center" FontSize="10" FontFamily="{StaticResource MonoFont}"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowCross.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowCross.AvailableTargets}"
+                                  SelectedValue="{Binding RowCross.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Square (□) -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushAccentPink}" BorderThickness="2" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="□ CUADRADO" FontWeight="Black" Foreground="{StaticResource BrushAccentPink}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="pad_button0" FontWeight="Bold" Foreground="{StaticResource BrushTextMuted}" VerticalAlignment="Center" FontSize="10" FontFamily="{StaticResource MonoFont}"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowSquare.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowSquare.AvailableTargets}"
+                                  SelectedValue="{Binding RowSquare.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- R3 Stick Click -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushTextWhite}" BorderThickness="1" Padding="6,1" Margin="0,0,6,0">
+                                <TextBlock Text="R3" FontWeight="Black" Foreground="#FFFFFF" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="Click Stick Der (R3)" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center" FontSize="11"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowR3.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowR3.AvailableTargets}"
+                                  SelectedValue="{Binding RowR3.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Options -->
+                <Border Style="{StaticResource BrutalistCardItem}">
+                    <StackPanel>
+                        <DockPanel>
+                            <Border Background="#000000" BorderBrush="{StaticResource BrushAccentYellow}" BorderThickness="1" Padding="5,1" Margin="0,0,6,0">
+                                <TextBlock Text="OPTIONS" FontWeight="Black" Foreground="{StaticResource BrushAccentYellow}" FontSize="10" FontFamily="{StaticResource MonoFont}"/>
+                            </Border>
+                            <TextBlock Text="Options / Start" FontWeight="Bold" Foreground="{StaticResource BrushTextSecondary}" VerticalAlignment="Center" FontSize="11"/>
+                            <Button Content="CAPTURAR" Command="{Binding RowOptions.CaptureCommand}" Style="{StaticResource VisualCaptureBtnStyle}" HorizontalAlignment="Right" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                        <ComboBox ItemsSource="{Binding RowOptions.AvailableTargets}"
+                                  SelectedValue="{Binding RowOptions.TargetValue, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValuePath="Value" DisplayMemberPath="DisplayText"
+                                  Style="{StaticResource VisualComboStyle}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
